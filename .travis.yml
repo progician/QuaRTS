@@ -21,7 +21,5 @@ install:
 
 script:
   - conan install -if build .
-  - mkdir build
-  - cd build
-  - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
-  - cmake --build .
+  - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -Bbuild .
+  - cmake --build build

@@ -17,9 +17,10 @@ before_install:
 
 install:
   - pip install --user -U pip
-  - pip install --user cmake ninja
+  - pip install --user cmake ninja conan
 
 script:
+  - conan install -if build .
   - mkdir build
   - cd build
   - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..

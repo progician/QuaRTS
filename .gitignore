@@ -1,0 +1,8 @@
+.vscode/
+rel/
+deb/
+build/
+env/
+
+*.o
+*.pyc

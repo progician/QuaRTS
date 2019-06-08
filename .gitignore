@@ -1,4 +1,5 @@
 .vscode/
+.conan/
 rel/
 deb/
 build/

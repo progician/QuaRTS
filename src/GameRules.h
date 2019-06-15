@@ -1,6 +1,8 @@
 #pragma once
 
+#include <unordered_set>
 #include <string>
+#include <vector>
 
 namespace GameRules {
   class Player {
@@ -11,14 +13,31 @@ namespace GameRules {
     auto name() const { return name_; }
     auto operator==(Player const& rhs) const { return name_ == rhs.name_; }
   };
+}
 
+namespace std {
+  template<> struct hash<GameRules::Player> {
+    std::size_t operator()(GameRules::Player const& player) const {
+      return std::hash<std::string>{}(player.name());
+    }
+  };
+}
 
+namespace GameRules {
   class Match {
-    Player player_;
-  public:
-    Match(Player player) : player_{player} {}
+    std::unordered_set<Player> players_;
 
-    auto finished() const -> bool { return true; }
-    auto winner() const -> Player { return player_; }
+  public:
+    Match(std::initializer_list<std::string> l);
+
+    auto finished() const -> bool;
+    auto winner() const -> Player { return *players_.begin(); }
+
+    void resign(std::string const& player_name) {
+      players_.erase(players_.find({player_name}));
+    }
+
+    using PlayerSet = std::unordered_set<Player>;
+    auto active_players() const -> PlayerSet { return players_; }
   };
 }

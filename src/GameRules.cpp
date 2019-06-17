@@ -7,6 +7,7 @@ namespace GameRules {
     }
   }
 
+
   auto Match::finished() const -> bool {
     return players_.size() == 1;
   }
@@ -20,4 +21,7 @@ namespace GameRules {
       }
     }
   }
+
+
+  void Match::listen(MatchEventsPtr ptr) { listeners_.push_back(ptr); }
 }

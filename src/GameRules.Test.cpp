@@ -17,7 +17,7 @@ namespace GameRules {
 using namespace GameRules;
 
 
-TEST_CASE("A Match created with a single player is automatically finished") {
+TEST_CASE("A Match created with a single player is automatically finished", "[GameRules]") {
   static auto const SingularPlayer = std::string{"Some Named Player"};
   auto match = Match{SingularPlayer};
   REQUIRE(match.finished());
@@ -28,13 +28,13 @@ TEST_CASE("A Match created with a single player is automatically finished") {
 }
 
 
-TEST_CASE("A Match is ongoing if there is at least two players") {
+TEST_CASE("A Match is ongoing if there is at least two players", "[GameRules]") {
   auto match = Match{"X", "Y"};
   REQUIRE_FALSE(match.finished());
 }
 
 
-TEST_CASE("Match maintains the set of active players") {
+TEST_CASE("Match maintains the set of active players", "[GameRules]") {
   auto match = Match{"X", "Y", "Z"};
 
   SECTION("which is by default all the players") {
@@ -65,7 +65,7 @@ public:
   }
 };
 
-TEST_CASE("When the all but one player resigns, the game finishes") {
+TEST_CASE("When the all but one player resigns, the game finishes", "[GameRules]") {
   auto match = Match{"X", "Y"};
   match.resign("X");
 
@@ -78,13 +78,15 @@ struct MatchEventsMock : public MatchEvents {
 };
 
 
-TEST_CASE("when a match comes to a conclusion, all listeners will be notified") {
+TEST_CASE("when a match comes to a conclusion, all listeners will be notified", "[GameRules]") {
   auto match_events = std::make_shared<MatchEventsMock>();
   auto match = Match{"X", "Y"};
+
   constexpr auto ArbitraryNumberOfListeners = 7;
   for (auto i = 0; i < ArbitraryNumberOfListeners; ++i) {
     match.listen(match_events);
   }
+
   REQUIRE_CALL(*match_events, finished(std::string{"Y"}))
       .TIMES(ArbitraryNumberOfListeners)
   ;

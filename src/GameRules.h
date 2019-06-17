@@ -42,7 +42,7 @@ namespace GameRules {
     using PlayerSet = std::unordered_set<Player>;
     auto active_players() const -> PlayerSet { return players_; }
 
-    void listen(MatchEventsPtr listener) { listeners_.push_back(listener); }
+    void listen(MatchEventsPtr listener);
   };
 
 

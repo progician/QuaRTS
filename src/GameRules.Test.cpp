@@ -81,12 +81,11 @@ struct MatchEventsMock : public GameRules::MatchEvents {
 
 
 TEST_CASE("when a match comes to a conclusion, listeners will be notified") {
-  using trompeloeil::_;
   using namespace GameRules;
   auto match_events = std::make_shared<MatchEventsMock>();
   auto match = GameRules::Match{"X", "Y"};
   match.listen(match_events);
-  REQUIRE_CALL(*match_events, finished(_));
+  REQUIRE_CALL(*match_events, finished(std::string{"Y"}));
 
   match.resign("X");
 }

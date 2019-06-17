@@ -1,7 +1,9 @@
 #include "GameRules.h"
 
 #include <catch2/catch.hpp>
+#include <trompeloeil.hpp>
 #include <iostream>
+#include <sstream>
 
 
 namespace GameRules {
@@ -47,14 +49,44 @@ TEST_CASE("Match maintains the set of active players") {
 }
 
 
+using namespace Catch::Matchers;
+class WonBy : public Catch::MatcherBase<GameRules::Match> {
+  std::string const name_;
+public:
+  WonBy(std::string name) : name_{name} {}
+
+  bool match(GameRules::Match const& rhs) const override {
+    return rhs.finished() && rhs.winner().name() == name_;
+  }
+
+  std::string describe() const override {
+    std::ostringstream ostr;
+    ostr << "won by " << name_;
+    return ostr.str();
+  }
+};
+
 TEST_CASE("When the all but one player resigns, the game finishes") {
   using namespace GameRules;
   auto match = Match{"X", "Y"};
   match.resign("X");
 
-  REQUIRE(match.finished());
+  REQUIRE_THAT(match, WonBy("Y"));
+}
 
-  SECTION("and the winner is the remaining player") {
-    REQUIRE(match.winner().name() == "Y");
-  }
+
+struct MatchEventsMock : public GameRules::MatchEvents {
+  MAKE_MOCK1(finished, void(std::string const&), override);
+};
+
+
+TEST_CASE("when a match comes to a conclusion, listeners will be notified") {
+  using trompeloeil::_;
+  using namespace GameRules;
+  auto match_events = std::make_shared<MatchEventsMock>();
+  auto match = GameRules::Match{"X", "Y"};
+  match.listen(match_events);
+  REQUIRE_CALL(*match_events, finished(_));
+
+  match.resign("X");
 }

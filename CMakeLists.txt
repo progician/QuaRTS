@@ -26,6 +26,10 @@ target_link_libraries(QuaRTS PRIVATE QuaRTS.Base)
 
 option(USE_UNIT_TESTS "Build and run unit tests during the build." ON)
 if (USE_UNIT_TESTS)
+    find_path(TROMPELOEIL_INCLUDE_DIR trompeloeil.hpp)
+    if (NOT TROMPELOEIL_INCLUDE_DIR)
+        message(FATAL_ERROR "Trompeloeil library not found!")
+    endif()
     find_package(Catch2 REQUIRED)
     add_executable(QuaRTS.UT)
     target_sources(QuaRTS.UT 
@@ -33,6 +37,7 @@ if (USE_UNIT_TESTS)
             src/GameRules.Test.cpp
             src/Main.Test.cpp
     )
+    target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})
     target_link_libraries(QuaRTS.UT PRIVATE QuaRTS.Base Catch2::Catch2)
     add_custom_command(
         TARGET QuaRTS.UT POST_BUILD

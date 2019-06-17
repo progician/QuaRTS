@@ -25,7 +25,11 @@ namespace std {
 
 namespace GameRules {
   class Match {
+  public:
+    using MatchEventsPtr = std::shared_ptr<struct MatchEvents>;
+  private:
     std::unordered_set<Player> players_;
+    MatchEventsPtr listener_;
 
   public:
     Match(std::initializer_list<std::string> l);
@@ -33,11 +37,16 @@ namespace GameRules {
     auto finished() const -> bool;
     auto winner() const -> Player { return *players_.begin(); }
 
-    void resign(std::string const& player_name) {
-      players_.erase(players_.find({player_name}));
-    }
+    void resign(std::string const& player_name);
 
     using PlayerSet = std::unordered_set<Player>;
     auto active_players() const -> PlayerSet { return players_; }
+
+    void listen(MatchEventsPtr listener) { listener_ = listener; }
+  };
+
+
+  struct MatchEvents {
+    virtual void finished(std::string const&) = 0;
   };
 }

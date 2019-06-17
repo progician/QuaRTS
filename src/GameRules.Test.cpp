@@ -14,9 +14,10 @@ namespace GameRules {
 }
 
 
+using namespace GameRules;
+
 
 TEST_CASE("A Match created with a single player is automatically finished") {
-  using namespace GameRules;
   static auto const SingularPlayer = std::string{"Some Named Player"};
   auto match = Match{SingularPlayer};
   REQUIRE(match.finished());
@@ -28,14 +29,12 @@ TEST_CASE("A Match created with a single player is automatically finished") {
 
 
 TEST_CASE("A Match is ongoing if there is at least two players") {
-  using namespace GameRules;
   auto match = Match{"X", "Y"};
   REQUIRE_FALSE(match.finished());
 }
 
 
 TEST_CASE("Match maintains the set of active players") {
-  using namespace GameRules;
   auto match = Match{"X", "Y", "Z"};
 
   SECTION("which is by default all the players") {
@@ -50,12 +49,12 @@ TEST_CASE("Match maintains the set of active players") {
 
 
 using namespace Catch::Matchers;
-class WonBy : public Catch::MatcherBase<GameRules::Match> {
+class WonBy : public Catch::MatcherBase<Match> {
   std::string const name_;
 public:
   WonBy(std::string name) : name_{name} {}
 
-  bool match(GameRules::Match const& rhs) const override {
+  bool match(Match const& rhs) const override {
     return rhs.finished() && rhs.winner().name() == name_;
   }
 
@@ -67,7 +66,6 @@ public:
 };
 
 TEST_CASE("When the all but one player resigns, the game finishes") {
-  using namespace GameRules;
   auto match = Match{"X", "Y"};
   match.resign("X");
 
@@ -75,26 +73,14 @@ TEST_CASE("When the all but one player resigns, the game finishes") {
 }
 
 
-struct MatchEventsMock : public GameRules::MatchEvents {
+struct MatchEventsMock : public MatchEvents {
   MAKE_MOCK1(finished, void(std::string const&), override);
 };
 
 
-TEST_CASE("when a match comes to a conclusion, listeners will be notified") {
-  using namespace GameRules;
+TEST_CASE("when a match comes to a conclusion, all listeners will be notified") {
   auto match_events = std::make_shared<MatchEventsMock>();
-  auto match = GameRules::Match{"X", "Y"};
-  match.listen(match_events);
-  REQUIRE_CALL(*match_events, finished(std::string{"Y"}));
-
-  match.resign("X");
-}
-
-
-TEST_CASE("multiple listeners can be set up") {
-  using namespace GameRules;
-  auto match_events = std::make_shared<MatchEventsMock>();
-  auto match = GameRules::Match{"X", "Y"};
+  auto match = Match{"X", "Y"};
   constexpr auto ArbitraryNumberOfListeners = 7;
   for (auto i = 0; i < ArbitraryNumberOfListeners; ++i) {
     match.listen(match_events);

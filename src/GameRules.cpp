@@ -14,8 +14,10 @@ namespace GameRules {
 
   void Match::resign(std::string const& player_name) {
     players_.erase(players_.find({player_name}));
-    if (players_.size() == 1 && listener_) {
-      listener_->finished(players_.begin()->name());
+    if (players_.size() == 1) {
+      for (auto listener : listeners_) {
+        listener->finished(players_.begin()->name());
+      }
     }
   }
 }

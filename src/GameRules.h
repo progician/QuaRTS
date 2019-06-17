@@ -29,7 +29,7 @@ namespace GameRules {
     using MatchEventsPtr = std::shared_ptr<struct MatchEvents>;
   private:
     std::unordered_set<Player> players_;
-    MatchEventsPtr listener_;
+    std::vector<MatchEventsPtr> listeners_;
 
   public:
     Match(std::initializer_list<std::string> l);
@@ -42,7 +42,7 @@ namespace GameRules {
     using PlayerSet = std::unordered_set<Player>;
     auto active_players() const -> PlayerSet { return players_; }
 
-    void listen(MatchEventsPtr listener) { listener_ = listener; }
+    void listen(MatchEventsPtr listener) { listeners_.push_back(listener); }
   };
 
 

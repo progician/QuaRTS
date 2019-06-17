@@ -89,3 +89,19 @@ TEST_CASE("when a match comes to a conclusion, listeners will be notified") {
 
   match.resign("X");
 }
+
+
+TEST_CASE("multiple listeners can be set up") {
+  using namespace GameRules;
+  auto match_events = std::make_shared<MatchEventsMock>();
+  auto match = GameRules::Match{"X", "Y"};
+  constexpr auto ArbitraryNumberOfListeners = 7;
+  for (auto i = 0; i < ArbitraryNumberOfListeners; ++i) {
+    match.listen(match_events);
+  }
+  REQUIRE_CALL(*match_events, finished(std::string{"Y"}))
+      .TIMES(ArbitraryNumberOfListeners)
+  ;
+
+  match.resign("X");
+}

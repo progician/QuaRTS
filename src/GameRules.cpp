@@ -1,5 +1,9 @@
 #include "GameRules.h"
 
+#include <atomic>
+#include <limits>
+#include <stdexcept>
+
 namespace GameRules {
   Match::Match(std::initializer_list<std::string> l) {
     for (auto&& player_name : l) {
@@ -24,4 +28,15 @@ namespace GameRules {
 
 
   void Match::listen(MatchEventsPtr ptr) { listeners_.push_back(ptr); }
+
+  auto Game::spawn_unit_at(Location location) -> UnitRef {
+    static auto CurrentUnitID = std::atomic_int32_t{0};
+    if (CurrentUnitID == std::numeric_limits<int>::max()) {
+      throw std::runtime_error("Unit ID overflow, cannot create a new one!");
+    }
+
+    auto const ref = UnitRef{CurrentUnitID++};
+    units_[ref.id] = location;
+    return ref;
+  }
 }

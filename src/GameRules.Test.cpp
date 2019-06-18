@@ -96,3 +96,12 @@ TEST_CASE("when a match comes to a conclusion, all listeners will be notified", 
 
   match.resign("X");
 }
+
+
+TEST_CASE("Given a game with a unit spawned at the origin.") {
+  auto game = Game{};
+  auto const SomeLocation = Location{1234, 5678};
+  auto unit = game.spawn_unit_at(SomeLocation);
+
+  REQUIRE(game.position_of(unit) == SomeLocation);
+}

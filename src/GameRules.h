@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -51,5 +52,25 @@ namespace GameRules {
 
   struct MatchEvents {
     virtual void finished(std::string const&) = 0;
+  };
+
+
+  struct Location {
+    int x, y;
+  };
+
+  inline auto operator==(
+      Location const& lhs, Location const& rhs
+  ) noexcept -> bool
+  { return lhs.x == rhs.x && lhs.y == rhs.y; }
+
+
+  class Game {
+    std::unordered_map<int, Location> units_;
+  public:
+    struct UnitRef { int id; };
+    
+    auto spawn_unit_at(Location) -> UnitRef;
+    auto position_of(UnitRef ref) const -> Location { return units_.at(ref.id); }
   };
 }

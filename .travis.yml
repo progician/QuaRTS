@@ -20,6 +20,6 @@ install:
   - pip install --user cmake ninja conan
 
 script:
-  - conan install -if build .
+  - conan install -if build . --build=missing
   - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -Bbuild .
   - cmake --build build

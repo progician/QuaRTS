@@ -18,7 +18,7 @@ matrix:
     - os: osx
       osx_image: xcode10.1
       env:
-        - MATRIX_EVAL="PATH=~/Libraries/Python/2.7/bin:$PATH"
+        - MATRIX_EVAL="PATH=$HOME/Library/Python/2.7/bin:$PATH"
 
 before_install:
     - eval "${MATRIX_EVAL}"

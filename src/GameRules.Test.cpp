@@ -2,8 +2,11 @@
 
 #include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
+
 #include <iostream>
+#include <memory>
 #include <sstream>
+#include <string>
 
 
 namespace GameRules {

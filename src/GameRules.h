@@ -1,7 +1,10 @@
 #pragma once
 
-#include <unordered_set>
+#include <initializer_list>
+#include <memory>
 #include <string>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 namespace GameRules {

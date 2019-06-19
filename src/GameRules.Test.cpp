@@ -1,5 +1,7 @@
 #include "GameRules.h"
 
+#include "PlanePrimitives.h"
+
 #include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
 

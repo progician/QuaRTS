@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PlanePrimitives.h"
+
 #include <chrono>
 #include <initializer_list>
 #include <limits>
@@ -57,21 +59,13 @@ namespace GameRules {
   };
 
 
-  struct Location {
-    float x, y;
-  };
-
-  inline auto operator==(
-      Location const& lhs, Location const& rhs
-  ) noexcept -> bool
-  { return lhs.x == rhs.x && lhs.y == rhs.y; }
-
-
   class InvalidPosition : public std::runtime_error {
   public:
     InvalidPosition() : std::runtime_error("Position is out of bounds!") {}
   };
 
+
+  using PlanePrimitives::Location;
 
   class Game {
     using UnitPtr = std::unique_ptr<struct Unit>;

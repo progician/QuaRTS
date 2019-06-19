@@ -65,13 +65,14 @@ namespace GameRules {
   };
 
 
-  using PlanePrimitives::Location;
-
   class Game {
     using UnitPtr = std::unique_ptr<struct Unit>;
     std::unordered_map<int, UnitPtr> units_;
-    float const width_{std::numeric_limits<float>::infinity()};
-    float const height_{std::numeric_limits<float>::infinity()};
+
+    PlanePrimitives::Size const map_dimensions_{
+      std::numeric_limits<float>::infinity(),
+      std::numeric_limits<float>::infinity(),
+    };
 
   public:
     Game();
@@ -80,10 +81,10 @@ namespace GameRules {
 
     struct UnitRef { int id; };
     
-    auto spawn_unit_at(Location) -> UnitRef;
-    auto position_of(UnitRef ref) const -> Location;
+    auto spawn_unit_at(PlanePrimitives::Location) -> UnitRef;
+    auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
 
-    void move(UnitRef, Location);
+    void move(UnitRef, PlanePrimitives::Location);
 
     using Duration = std::chrono::duration<float>;
     void update(Duration);

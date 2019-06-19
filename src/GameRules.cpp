@@ -6,6 +6,8 @@
 #include <optional>
 #include <stdexcept>
 
+using namespace PlanePrimitives;
+
 namespace GameRules {
   Match::Match(std::initializer_list<std::string> l) {
     for (auto&& player_name : l) {
@@ -40,7 +42,7 @@ namespace GameRules {
 
 
   Game::Game() = default;
-  Game::Game(float width, float height) : width_{width}, height_{height} {}
+  Game::Game(float width, float height) : map_dimensions_{width, height} {}
   Game::~Game() = default;
 
   auto Game::position_of(UnitRef ref) const -> Location {
@@ -53,11 +55,8 @@ namespace GameRules {
       throw std::runtime_error("Unit ID overflow, cannot create a new one!");
     }
 
-    if (location.x < 0 || location.x > width_) {
-      throw InvalidPosition{};
-    }
-
-    if (location.y < 0 || location.y > height_) {
+    auto const rect = Rectangle{map_dimensions_};
+    if (!Contains(rect, location)) {
       throw InvalidPosition{};
     }
 

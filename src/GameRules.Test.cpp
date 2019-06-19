@@ -17,7 +17,9 @@ namespace GameRules {
     lhs << rhs.name();
     return lhs;
   }
+}
 
+namespace PlanePrimitives {
   std::ostream& operator <<(std::ostream& lhs, Location const& rhs) {
     lhs << "{" << rhs.x << "," << rhs.y << "}";
     return lhs;
@@ -26,6 +28,7 @@ namespace GameRules {
 
 
 using namespace GameRules;
+using PlanePrimitives::Location;
 
 
 TEST_CASE("A Match created with a single player is automatically finished", "[GameRules]") {

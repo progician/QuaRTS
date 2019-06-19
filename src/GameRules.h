@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <initializer_list>
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -66,12 +67,21 @@ namespace GameRules {
   { return lhs.x == rhs.x && lhs.y == rhs.y; }
 
 
+  class InvalidPosition : public std::runtime_error {
+  public:
+    InvalidPosition() : std::runtime_error("Position is out of bounds!") {}
+  };
+
+
   class Game {
     using UnitPtr = std::unique_ptr<struct Unit>;
     std::unordered_map<int, UnitPtr> units_;
+    float const width_{std::numeric_limits<float>::infinity()};
+    float const height_{std::numeric_limits<float>::infinity()};
 
   public:
     Game();
+    Game(float, float);
     ~Game();
 
     struct UnitRef { int id; };

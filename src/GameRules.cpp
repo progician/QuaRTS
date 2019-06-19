@@ -40,6 +40,7 @@ namespace GameRules {
 
 
   Game::Game() = default;
+  Game::Game(float width, float height) : width_{width}, height_{height} {}
   Game::~Game() = default;
 
   auto Game::position_of(UnitRef ref) const -> Location {
@@ -50,6 +51,14 @@ namespace GameRules {
     static auto CurrentUnitID = std::atomic_int32_t{0};
     if (CurrentUnitID == std::numeric_limits<int>::max()) {
       throw std::runtime_error("Unit ID overflow, cannot create a new one!");
+    }
+
+    if (location.x < 0 || location.x > width_) {
+      throw InvalidPosition{};
+    }
+
+    if (location.y < 0 || location.y > height_) {
+      throw InvalidPosition{};
     }
 
     auto const ref = UnitRef{CurrentUnitID++};

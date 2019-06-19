@@ -1,6 +1,7 @@
 #include "GameRules.h"
 
 #include <atomic>
+#include <cmath>
 #include <limits>
 #include <optional>
 #include <stdexcept>

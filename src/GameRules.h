@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <initializer_list>
 #include <memory>
 #include <string>
@@ -56,7 +57,7 @@ namespace GameRules {
 
 
   struct Location {
-    int x, y;
+    float x, y;
   };
 
   inline auto operator==(
@@ -66,11 +67,21 @@ namespace GameRules {
 
 
   class Game {
-    std::unordered_map<int, Location> units_;
+    using UnitPtr = std::unique_ptr<struct Unit>;
+    std::unordered_map<int, UnitPtr> units_;
+
   public:
+    Game();
+    ~Game();
+
     struct UnitRef { int id; };
     
     auto spawn_unit_at(Location) -> UnitRef;
-    auto position_of(UnitRef ref) const -> Location { return units_.at(ref.id); }
+    auto position_of(UnitRef ref) const -> Location;
+
+    void move(UnitRef, Location);
+
+    using Duration = std::chrono::duration<float>;
+    void update(Duration);
   };
 }

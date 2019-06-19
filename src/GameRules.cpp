@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 
 namespace GameRules {
@@ -29,6 +30,21 @@ namespace GameRules {
 
   void Match::listen(MatchEventsPtr ptr) { listeners_.push_back(ptr); }
 
+
+  struct Unit {
+    Location location;
+    std::optional<Location> destination;
+    explicit Unit(Location l) : location{l} {}
+  };
+
+
+  Game::Game() = default;
+  Game::~Game() = default;
+
+  auto Game::position_of(UnitRef ref) const -> Location {
+    return units_.at(ref.id)->location;
+  }
+
   auto Game::spawn_unit_at(Location location) -> UnitRef {
     static auto CurrentUnitID = std::atomic_int32_t{0};
     if (CurrentUnitID == std::numeric_limits<int>::max()) {
@@ -36,7 +52,31 @@ namespace GameRules {
     }
 
     auto const ref = UnitRef{CurrentUnitID++};
-    units_[ref.id] = location;
+    units_[ref.id] = std::make_unique<Unit>(location);
     return ref;
+  }
+
+  void Game::move(UnitRef ref, Location location) {
+    units_.at(ref.id)->destination = location;
+  }
+
+  void Game::update(Game::Duration d) {
+    for (auto& [id, unit_ptr] : units_) {
+      auto& unit = *unit_ptr;
+      if (!unit.destination || unit.location == unit.destination) {
+        continue;
+      }
+
+      const auto translation = Location {
+        unit.destination->x - unit.location.x,
+        unit.destination->y - unit.location.y
+      };
+
+      const auto length = std::sqrt(translation.x*translation.x + translation.y*translation.y);
+      const float dx = translation.x / length; 
+      const float dy = translation.y / length; 
+      unit.location.x += dx * d.count();
+      unit.location.y += dy * d.count();
+    }
   }
 }

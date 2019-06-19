@@ -3,6 +3,7 @@
 #include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -12,6 +13,11 @@
 namespace GameRules {
   std::ostream& operator <<(std::ostream& lhs, Player const& rhs) {
     lhs << rhs.name();
+    return lhs;
+  }
+
+  std::ostream& operator <<(std::ostream& lhs, Location const& rhs) {
+    lhs << "{" << rhs.x << "," << rhs.y << "}";
     return lhs;
   }
 }
@@ -100,8 +106,19 @@ TEST_CASE("when a match comes to a conclusion, all listeners will be notified", 
 
 TEST_CASE("Given a game with a unit spawned at the origin.") {
   auto game = Game{};
-  auto const SomeLocation = Location{1234, 5678};
+  auto const SomeLocation = Location{0, 255};
   auto unit = game.spawn_unit_at(SomeLocation);
 
   REQUIRE(game.position_of(unit) == SomeLocation);
+
+  SECTION("the 'move' command will not affect position of the unit") {
+    game.move(unit, {0, 0});
+    REQUIRE(game.position_of(unit) == SomeLocation);
+
+    SECTION("until the simulation steps were called") {
+      using namespace std::chrono_literals;
+      game.update(255s);
+      REQUIRE(game.position_of(unit) == Location{0, 0});
+    }
+  }
 }

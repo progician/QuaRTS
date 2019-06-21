@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <cmath>
 #include <limits>
 #include <optional>
 #include <stdexcept>
@@ -77,22 +76,9 @@ namespace GameRules {
         continue;
       }
 
-      const auto translation = Location {
-        unit.destination->x - unit.location.x,
-        unit.destination->y - unit.location.y
-      };
-
-      const auto length = std::sqrt(translation.x*translation.x + translation.y*translation.y);
-      const float dx = translation.x / length; 
-      const float dy = translation.y / length; 
-      unit.location.x = std::min(
-          unit.location.x + dx * d.count(),
-          map_dimensions_.width
-      );
-      unit.location.y = std::min(
-          unit.location.y + dy * d.count(),
-          map_dimensions_.height
-      );
+      auto const direction = Normalized(*unit.destination - unit.location);
+      unit.location = unit.location + direction * d.count();
+      unit.location = PlanePrimitives::Clip(map_dimensions_, unit.location);
     }
   }
 }

@@ -1,5 +1,6 @@
 #include "GameRules.h"
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <limits>
@@ -84,8 +85,14 @@ namespace GameRules {
       const auto length = std::sqrt(translation.x*translation.x + translation.y*translation.y);
       const float dx = translation.x / length; 
       const float dy = translation.y / length; 
-      unit.location.x += dx * d.count();
-      unit.location.y += dy * d.count();
+      unit.location.x = std::min(
+          unit.location.x + dx * d.count(),
+          map_dimensions_.width
+      );
+      unit.location.y = std::min(
+          unit.location.y + dy * d.count(),
+          map_dimensions_.height
+      );
     }
   }
 }

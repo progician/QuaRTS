@@ -131,5 +131,18 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
 
 TEST_CASE("Units are limited to the map's dimensions") {
   auto game = Game{128, 128};
-  REQUIRE_THROWS_AS(game.spawn_unit_at({200, 200}), InvalidPosition);
+
+  SECTION("cannot spawn unit outside of the boundary") {
+    REQUIRE_THROWS_AS(game.spawn_unit_at({200, 200}), InvalidPosition);
+  }
+
+  SECTION("Units will stop at map boundaries") {
+    auto unit = game.spawn_unit_at({0, 0});
+    game.move(unit, {200, 0});
+
+    using namespace std::chrono_literals;
+    game.update(200s);
+
+    REQUIRE(game.position_of(unit) == Location{128, 0});
+  }
 }

@@ -65,6 +65,12 @@ namespace GameRules {
   };
 
 
+  enum class Command {
+    None,
+    Move,
+  };
+
+
   class Game {
     using UnitPtr = std::unique_ptr<struct Unit>;
     std::unordered_map<int, UnitPtr> units_;
@@ -83,6 +89,7 @@ namespace GameRules {
     
     auto spawn_unit_at(PlanePrimitives::Location) -> UnitRef;
     auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
+    auto active_command_for(UnitRef ref) const -> Command;
 
     void move(UnitRef, PlanePrimitives::Location);
 

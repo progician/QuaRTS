@@ -17,6 +17,15 @@ namespace GameRules {
     lhs << rhs.name();
     return lhs;
   }
+
+  auto operator <<(std::ostream& lhs, Command rhs) -> std::ostream& {
+    switch(rhs) {
+      case Command::None: lhs <<  "None"; break;
+      case Command::Move: lhs << "Move"; break;
+    }
+
+    return lhs;
+  }
 }
 
 namespace PlanePrimitives {
@@ -114,7 +123,13 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
   auto const SomeLocation = Location{0, 255};
   auto unit = game.spawn_unit_at(SomeLocation);
 
-  REQUIRE(game.position_of(unit) == SomeLocation);
+  SECTION("unit is at position of its origin") {
+    REQUIRE(game.position_of(unit) == SomeLocation);
+  }
+
+  SECTION("has no command at its pristine state") {
+    REQUIRE(game.active_command_for(unit) == Command::None);
+  }
 
   SECTION("the 'move' command will not affect position of the unit") {
     game.move(unit, {0, 0});
@@ -124,6 +139,26 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
       using namespace std::chrono_literals;
       game.update(255s);
       REQUIRE(game.position_of(unit) == Location{0, 0});
+    }
+  }
+
+  SECTION("when a unit gets updated more than it requires to reach its destination") {
+    using namespace std::chrono_literals;
+    auto const Destination = Location{0, 128};
+    game.move(unit, Destination);
+
+    constexpr auto TimeResolution = 1s;
+    using std::chrono::seconds;
+    for (seconds i = 0s; i < 255s; i += TimeResolution) {
+      game.update(TimeResolution);
+    }
+
+    SECTION("then it stays at its destination") {
+      REQUIRE(game.position_of(unit) == Destination);
+    }
+
+    SECTION("then it is no longer have an active move command") {
+      REQUIRE(game.active_command_for(unit) != Command::Move);
     }
   }
 }

@@ -77,8 +77,18 @@ namespace GameRules {
       }
 
       auto const direction = Normalized(*unit.destination - unit.location);
-      unit.location = unit.location + direction * d.count();
-      unit.location = PlanePrimitives::Clip(map_dimensions_, unit.location);
+      auto const new_location = unit.location + direction * d.count();
+      unit.location = PlanePrimitives::Clip(map_dimensions_, new_location);
+
+      if (unit.location == *unit.destination) {
+        unit.destination.reset();
+      }
     }
+  }
+
+  
+  auto Game::active_command_for(UnitRef ref) const -> Command {
+    auto const& unit = *units_.at(ref.id);
+    return !unit.destination ? Command::None : Command::Move;
   }
 }

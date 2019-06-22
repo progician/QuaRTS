@@ -59,8 +59,10 @@ namespace GameRules {
 
   struct Unit {
     Location location;
+    float attack_radius{std::numeric_limits<float>::infinity()};
     UnitCommand command{Commands::Idle{}};
     explicit Unit(Location l) : location{l} {}
+    Unit(Location l, float arad) : location{l}, attack_radius{arad} {}
   };
 
 
@@ -72,7 +74,7 @@ namespace GameRules {
     return units_.at(ref.id)->location;
   }
 
-  auto Game::spawn_unit_at(Location location) -> UnitRef {
+  auto Game::spawn_unit_at(Location location, float attack_radius) -> UnitRef {
     static auto CurrentUnitID = std::atomic_int32_t{0};
     if (CurrentUnitID == std::numeric_limits<int>::max()) {
       throw std::runtime_error("Unit ID overflow, cannot create a new one!");
@@ -84,13 +86,20 @@ namespace GameRules {
     }
 
     auto const ref = UnitRef{CurrentUnitID++};
-    units_[ref.id] = std::make_unique<Unit>(location);
+    units_[ref.id] = std::make_unique<Unit>(location, attack_radius);
     return ref;
   }
+
+
+  auto Game::spawn_unit_at(Location location) -> UnitRef {
+    return spawn_unit_at(location, std::numeric_limits<float>::infinity());
+  }
+
 
   void Game::move(UnitRef ref, Location location) {
     units_.at(ref.id)->command = Commands::Move{location};
   }
+
 
   void Game::update(Game::Duration d) {
     for (auto& [id, unit_ptr] : units_) {
@@ -109,8 +118,16 @@ namespace GameRules {
           },
 
           [&](Commands::Attack const& attack) {
-            if (listener_) {
-              listener_->damage(attack.target);
+            auto const& target = *units_.at(attack.target.id);
+            auto const distance = LengthOf(target.location - unit.location);
+            if (distance <= unit.attack_radius) {
+              if (listener_) {
+                listener_->damage(attack.target);
+              }
+            }
+            else {
+              auto const direction = Normalized(target.location - unit.location);
+              unit.location = unit.location + direction * d.count();
             }
           }
       );

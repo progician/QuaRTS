@@ -207,3 +207,42 @@ TEST_CASE("Units can attack each other, and inflict specific damage for every"
     game.update(1s);
   }
 }
+
+
+TEST_CASE("In a game units have an attack radius") {
+  using namespace trompeloeil;
+
+  auto game = Game{}; 
+  auto victim = game.spawn_unit_at({5, 5});
+  auto attacker = game.spawn_unit_at({100, 5}, 20);
+
+  game.attack(attacker, victim);
+
+  SECTION("outside of which the unit cannot inflict damage to the target") {
+    auto game_events = std::make_shared<GameEventsMock>();
+    game.listen(game_events);
+
+    FORBID_CALL(*game_events, damage(_));
+
+    game.update(1s);
+  }
+
+  SECTION("outside of which that attacker will move toward its target") {
+    game.update(1s);
+    REQUIRE(game.position_of(attacker) == Location{99, 5});
+  }
+
+  SECTION("when reaches the proximity of the target within this radius, stops and causes damage") {
+    auto game_events = std::make_shared<GameEventsMock>();
+    game.listen(game_events);
+    REQUIRE_CALL(*game_events, damage(victim)).TIMES(AT_LEAST(25));
+
+    constexpr auto TimeResolution = 1s;
+    using std::chrono::seconds;
+    for (seconds i = 0s; i < 100s; i += TimeResolution) {
+      game.update(TimeResolution);
+    }
+
+    REQUIRE(game.position_of(attacker) == Location{25, 5});
+  }
+}

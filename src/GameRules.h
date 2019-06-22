@@ -71,7 +71,7 @@ namespace GameRules {
     Attack,
   };
 
-  
+
   class Game {
   public:
     struct UnitRef { int id; };
@@ -98,6 +98,7 @@ namespace GameRules {
     ~Game();
 
     auto spawn_unit_at(PlanePrimitives::Location) -> UnitRef;
+    auto spawn_unit_at(PlanePrimitives::Location, float) -> UnitRef;
     auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
     auto active_command_for(UnitRef ref) const -> Command;
 

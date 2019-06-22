@@ -247,3 +247,18 @@ TEST_CASE("In a game units have an attack radius", "[GameRules]") {
     REQUIRE(game.position_of(attacker) == Location{25, 5});
   }
 }
+
+
+TEST_CASE("A unit under attack looses HP (hit points)", "[GameRules]") {
+  auto game = Game{}; 
+  UnitProperties const victim_props = UnitProperties::Make().hit_points(10);
+  auto victim = game.spawn_unit_at({5, 5}, victim_props);
+
+  UnitProperties const attacker_props = UnitProperties::Make().attack_damage(2);
+  auto attacker = game.spawn_unit_at({100, 5}, attacker_props);
+  game.attack(attacker, victim);
+
+  UpdateTimes(game, 1);
+
+  REQUIRE(game.unit(victim).hit_points() == 8);
+}

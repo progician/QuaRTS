@@ -59,10 +59,13 @@ namespace GameRules {
 
   struct Unit {
     Location location;
-    float attack_radius{std::numeric_limits<float>::infinity()};
     UnitCommand command{Commands::Idle{}};
-    explicit Unit(Location l) : location{l} {}
-    Unit(Location l, float arad) : location{l}, attack_radius{arad} {}
+    UnitProperties props;
+    Unit(Location l, UnitProperties p) : location{l}, props{p} {}
+
+    void take_damage(int v) {
+      props.hit_points_ -= v;
+    }
   };
 
 
@@ -74,7 +77,7 @@ namespace GameRules {
     return units_.at(ref.id)->location;
   }
 
-  auto Game::spawn_unit_at(Location location, float attack_radius) -> UnitRef {
+  auto Game::spawn_unit_at(Location location, UnitProperties const& props) -> UnitRef {
     static auto CurrentUnitID = std::atomic_int32_t{0};
     if (CurrentUnitID == std::numeric_limits<int>::max()) {
       throw std::runtime_error("Unit ID overflow, cannot create a new one!");
@@ -86,8 +89,13 @@ namespace GameRules {
     }
 
     auto const ref = UnitRef{CurrentUnitID++};
-    units_[ref.id] = std::make_unique<Unit>(location, attack_radius);
+    units_[ref.id] = std::make_unique<Unit>(location, props);
     return ref;
+  }
+
+  auto Game::spawn_unit_at(Location location, float attack_radius) -> UnitRef {
+    UnitProperties const props = UnitProperties::Make().attack_radius(attack_radius);
+    return spawn_unit_at(location, props);
   }
 
 
@@ -118,9 +126,10 @@ namespace GameRules {
           },
 
           [&](Commands::Attack const& attack) {
-            auto const& target = *units_.at(attack.target.id);
+            auto& target = *units_.at(attack.target.id);
             auto const distance = LengthOf(target.location - unit.location);
-            if (distance <= unit.attack_radius) {
+            if (distance <= unit.props.attack_radius()) {
+              target.take_damage(unit.props.attack_damage());
               if (listener_) {
                 listener_->damage(attack.target);
               }
@@ -144,8 +153,15 @@ namespace GameRules {
     );
   }
 
+  
   void Game::attack(UnitRef attacker_ref, UnitRef target_ref) {
     auto& attacker = *units_.at(attacker_ref.id);
     attacker.command = Commands::Attack{target_ref};
+  }
+
+
+  auto Game::unit(UnitRef ref) const -> UnitProperties {
+    auto const& unit = *units_.at(ref.id);
+    return unit.props;
   }
 }

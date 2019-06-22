@@ -17,6 +17,8 @@ if(CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "Incompatible C++ standard ${CMAKE_CXX_STANDARD}.")
 endif()
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
+
 add_library(QuaRTS.Base OBJECT)
 target_sources(QuaRTS.Base PRIVATE src/GameRules.cpp)
 

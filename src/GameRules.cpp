@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <atomic>
 #include <limits>
-#include <optional>
 #include <stdexcept>
+#include <utility>
+#include <variant>
 
 using namespace PlanePrimitives;
 
@@ -34,9 +35,29 @@ namespace GameRules {
   void Match::listen(MatchEventsPtr ptr) { listeners_.push_back(ptr); }
 
 
+  namespace Commands {
+    using Idle = std::monostate;
+    struct Move {
+      Location loc;
+    };
+
+    struct Attack {
+      Game::UnitRef target;
+    };
+  }
+
+
+
+  using UnitCommand = std::variant<
+      Commands::Idle,
+      Commands::Move,
+      Commands::Attack
+  >;
+
+
   struct Unit {
     Location location;
-    std::optional<Location> destination;
+    UnitCommand command{Commands::Idle{}};
     explicit Unit(Location l) : location{l} {}
   };
 
@@ -66,29 +87,59 @@ namespace GameRules {
   }
 
   void Game::move(UnitRef ref, Location location) {
-    units_.at(ref.id)->destination = location;
+    units_.at(ref.id)->command = Commands::Move{location};
+  }
+
+  namespace {
+    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+    template<typename Variant, typename... Matchers>
+    auto match(Variant&& variant, Matchers&&... matchers) {
+      return std::visit(
+          overloaded{std::forward<Matchers>(matchers)...},
+          std::forward<Variant>(variant)
+      );
+    }
   }
 
   void Game::update(Game::Duration d) {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
-      if (!unit.destination || unit.location == unit.destination) {
-        continue;
-      }
+      match(unit.command,
+          [](Commands::Idle const&) {},
 
-      auto const direction = Normalized(*unit.destination - unit.location);
-      auto const new_location = unit.location + direction * d.count();
-      unit.location = PlanePrimitives::Clip(map_dimensions_, new_location);
+          [&](Commands::Move const& move) {
+            auto const direction = Normalized(move.loc - unit.location);
+            auto const new_location = unit.location + direction * d.count();
+            unit.location = PlanePrimitives::Clip(map_dimensions_, new_location);
 
-      if (unit.location == *unit.destination) {
-        unit.destination.reset();
-      }
+            if (unit.location == move.loc) {
+              unit.command = Commands::Idle{};
+            }
+          },
+
+          [&](Commands::Attack const& attack) {
+            if (listener_) {
+              listener_->damage(attack.target);
+            }
+          }
+      );
     }
   }
 
   
   auto Game::active_command_for(UnitRef ref) const -> Command {
     auto const& unit = *units_.at(ref.id);
-    return !unit.destination ? Command::None : Command::Move;
+    return match(unit.command,
+        [](Commands::Idle const&) -> Command { return Command::None; },
+        [](Commands::Move const&) -> Command { return Command::Move; },
+        [](Commands::Attack const&) -> Command { return Command::Attack; }
+    );
+  }
+
+  void Game::attack(UnitRef attacker_ref, UnitRef target_ref) {
+    auto& attacker = *units_.at(attacker_ref.id);
+    attacker.command = Commands::Attack{target_ref};
   }
 }

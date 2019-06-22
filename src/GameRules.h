@@ -68,10 +68,20 @@ namespace GameRules {
   enum class Command {
     None,
     Move,
+    Attack,
   };
 
-
+  
   class Game {
+  public:
+    struct UnitRef { int id; };
+    
+    struct GameEvents {
+      virtual void damage(UnitRef) = 0;
+    };
+    using GameEventsPtr = std::shared_ptr<GameEvents>;
+
+  private:
     using UnitPtr = std::unique_ptr<struct Unit>;
     std::unordered_map<int, UnitPtr> units_;
 
@@ -80,20 +90,27 @@ namespace GameRules {
       std::numeric_limits<float>::infinity(),
     };
 
+    GameEventsPtr listener_;
+
   public:
     Game();
     Game(float, float);
     ~Game();
 
-    struct UnitRef { int id; };
-    
     auto spawn_unit_at(PlanePrimitives::Location) -> UnitRef;
     auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
     auto active_command_for(UnitRef ref) const -> Command;
 
     void move(UnitRef, PlanePrimitives::Location);
+    void attack(UnitRef, UnitRef);
 
     using Duration = std::chrono::duration<float>;
     void update(Duration);
+
+    void listen(GameEventsPtr l) { listener_ = l; }
   };
+
+  inline auto operator ==(Game::UnitRef lhs, Game::UnitRef rhs) noexcept -> bool {
+    return lhs.id == rhs.id;
+  }
 }

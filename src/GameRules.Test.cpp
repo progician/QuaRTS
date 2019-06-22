@@ -22,6 +22,7 @@ namespace GameRules {
     switch(rhs) {
       case Command::None: lhs <<  "None"; break;
       case Command::Move: lhs << "Move"; break;
+      case Command::Attack: lhs << "Attack"; break;
     }
 
     return lhs;
@@ -38,6 +39,7 @@ namespace PlanePrimitives {
 
 using namespace GameRules;
 using PlanePrimitives::Location;
+using namespace std::chrono_literals;
 
 
 TEST_CASE("A Match created with a single player is automatically finished", "[GameRules]") {
@@ -136,14 +138,12 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
     REQUIRE(game.position_of(unit) == SomeLocation);
 
     SECTION("until the simulation steps were called") {
-      using namespace std::chrono_literals;
       game.update(255s);
       REQUIRE(game.position_of(unit) == Location{0, 0});
     }
   }
 
   SECTION("when a unit gets updated more than it requires to reach its destination") {
-    using namespace std::chrono_literals;
     auto const Destination = Location{0, 128};
     game.move(unit, Destination);
 
@@ -175,9 +175,35 @@ TEST_CASE("Units are limited to the map's dimensions") {
     auto unit = game.spawn_unit_at({0, 0});
     game.move(unit, {200, 0});
 
-    using namespace std::chrono_literals;
     game.update(200s);
 
     REQUIRE(game.position_of(unit) == Location{128, 0});
+  }
+}
+
+
+struct GameEventsMock : public Game::GameEvents {
+  MAKE_MOCK1(damage, void(Game::UnitRef), override);
+};
+
+
+TEST_CASE("Units can attack each other, and inflict specific damage for every"
+          "attack cycles") {
+  auto game = Game{}; 
+  auto victim = game.spawn_unit_at({0, 0});
+  auto attacker = game.spawn_unit_at({10, 0});
+
+  game.attack(attacker, victim);
+
+  SECTION("The attacker is has the active command of attack") {
+    REQUIRE(game.active_command_for(attacker) == Command::Attack);
+  }
+
+  SECTION("Notification of damage at simulation cycles") {
+    auto game_events = std::make_shared<GameEventsMock>();
+    game.listen(game_events);
+    REQUIRE_CALL(*game_events, damage(victim));
+
+    game.update(1s);
   }
 }

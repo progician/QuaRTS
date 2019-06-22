@@ -235,7 +235,7 @@ TEST_CASE("In a game units have an attack radius") {
   SECTION("when reaches the proximity of the target within this radius, stops and causes damage") {
     auto game_events = std::make_shared<GameEventsMock>();
     game.listen(game_events);
-    REQUIRE_CALL(*game_events, damage(victim)).TIMES(AT_LEAST(25));
+    REQUIRE_CALL(*game_events, damage(victim)).TIMES(25);
 
     constexpr auto TimeResolution = 1s;
     using std::chrono::seconds;

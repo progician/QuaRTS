@@ -1,5 +1,7 @@
 #include "GameRules.h"
 
+#include "Variant.h"
+
 #include <algorithm>
 #include <atomic>
 #include <limits>
@@ -90,23 +92,10 @@ namespace GameRules {
     units_.at(ref.id)->command = Commands::Move{location};
   }
 
-  namespace {
-    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
-    template<typename Variant, typename... Matchers>
-    auto match(Variant&& variant, Matchers&&... matchers) {
-      return std::visit(
-          overloaded{std::forward<Matchers>(matchers)...},
-          std::forward<Variant>(variant)
-      );
-    }
-  }
-
   void Game::update(Game::Duration d) {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
-      match(unit.command,
+      Variant::Match(unit.command,
           [](Commands::Idle const&) {},
 
           [&](Commands::Move const& move) {
@@ -131,7 +120,7 @@ namespace GameRules {
   
   auto Game::active_command_for(UnitRef ref) const -> Command {
     auto const& unit = *units_.at(ref.id);
-    return match(unit.command,
+    return Variant::Match(unit.command,
         [](Commands::Idle const&) -> Command { return Command::None; },
         [](Commands::Move const&) -> Command { return Command::Move; },
         [](Commands::Attack const&) -> Command { return Command::Attack; }

@@ -42,6 +42,15 @@ using PlanePrimitives::Location;
 using namespace std::chrono_literals;
 
 
+void UpdateTimes(Game& game, int times) {
+  constexpr auto TimeResolution = 1s;
+  using std::chrono::seconds;
+  for (seconds i = 0s; i < seconds(times); i += TimeResolution) {
+    game.update(TimeResolution);
+  }
+}
+
+
 TEST_CASE("A Match created with a single player is automatically finished", "[GameRules]") {
   static auto const SingularPlayer = std::string{"Some Named Player"};
   auto match = Match{SingularPlayer};
@@ -138,7 +147,7 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
     REQUIRE(game.position_of(unit) == SomeLocation);
 
     SECTION("until the simulation steps were called") {
-      game.update(255s);
+      UpdateTimes(game, 255);
       REQUIRE(game.position_of(unit) == Location{0, 0});
     }
   }
@@ -147,11 +156,7 @@ TEST_CASE("Given a game with a unit spawned at the origin.") {
     auto const Destination = Location{0, 128};
     game.move(unit, Destination);
 
-    constexpr auto TimeResolution = 1s;
-    using std::chrono::seconds;
-    for (seconds i = 0s; i < 255s; i += TimeResolution) {
-      game.update(TimeResolution);
-    }
+    UpdateTimes(game, 255);
 
     SECTION("then it stays at its destination") {
       REQUIRE(game.position_of(unit) == Destination);
@@ -175,7 +180,7 @@ TEST_CASE("Units are limited to the map's dimensions") {
     auto unit = game.spawn_unit_at({0, 0});
     game.move(unit, {200, 0});
 
-    game.update(200s);
+    UpdateTimes(game, 200);
 
     REQUIRE(game.position_of(unit) == Location{128, 0});
   }
@@ -204,7 +209,7 @@ TEST_CASE("Units can attack each other, and inflict specific damage for every"
     game.listen(game_events);
     REQUIRE_CALL(*game_events, damage(victim));
 
-    game.update(1s);
+    UpdateTimes(game, 1);
   }
 }
 
@@ -224,11 +229,11 @@ TEST_CASE("In a game units have an attack radius") {
 
     FORBID_CALL(*game_events, damage(_));
 
-    game.update(1s);
+    UpdateTimes(game, 1);
   }
 
   SECTION("outside of which that attacker will move toward its target") {
-    game.update(1s);
+    UpdateTimes(game, 1);
     REQUIRE(game.position_of(attacker) == Location{99, 5});
   }
 
@@ -237,11 +242,7 @@ TEST_CASE("In a game units have an attack radius") {
     game.listen(game_events);
     REQUIRE_CALL(*game_events, damage(victim)).TIMES(25);
 
-    constexpr auto TimeResolution = 1s;
-    using std::chrono::seconds;
-    for (seconds i = 0s; i < 100s; i += TimeResolution) {
-      game.update(TimeResolution);
-    }
+    UpdateTimes(game, 100);
 
     REQUIRE(game.position_of(attacker) == Location{25, 5});
   }

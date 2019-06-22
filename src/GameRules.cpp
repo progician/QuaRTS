@@ -93,17 +93,6 @@ namespace GameRules {
     return ref;
   }
 
-  auto Game::spawn_unit_at(Location location, float attack_radius) -> UnitRef {
-    UnitProperties const props = UnitProperties::Make().attack_radius(attack_radius);
-    return spawn_unit_at(location, props);
-  }
-
-
-  auto Game::spawn_unit_at(Location location) -> UnitRef {
-    return spawn_unit_at(location, std::numeric_limits<float>::infinity());
-  }
-
-
   void Game::move(UnitRef ref, Location location) {
     units_.at(ref.id)->command = Commands::Move{location};
   }

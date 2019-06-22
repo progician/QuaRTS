@@ -147,8 +147,6 @@ namespace GameRules {
     Game(float, float);
     ~Game();
 
-    auto spawn_unit_at(PlanePrimitives::Location) -> UnitRef;
-    auto spawn_unit_at(PlanePrimitives::Location, float) -> UnitRef;
     auto spawn_unit_at(PlanePrimitives::Location, UnitProperties const&) -> UnitRef;
     auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
     auto unit(UnitRef ref) const -> UnitProperties;

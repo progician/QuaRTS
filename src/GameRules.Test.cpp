@@ -132,7 +132,7 @@ TEST_CASE("when a match comes to a conclusion, all listeners will be notified", 
 TEST_CASE("Given a game with a unit spawned at the origin.", "[GameRules]") {
   auto game = Game{};
   auto const SomeLocation = Location{0, 255};
-  auto unit = game.spawn_unit_at(SomeLocation);
+  auto unit = game.spawn_unit_at(SomeLocation, {});
 
   SECTION("unit is at position of its origin") {
     REQUIRE(game.position_of(unit) == SomeLocation);
@@ -173,11 +173,11 @@ TEST_CASE("Units are limited to the map's dimensions", "[GameRules]") {
   auto game = Game{128, 128};
 
   SECTION("cannot spawn unit outside of the boundary") {
-    REQUIRE_THROWS_AS(game.spawn_unit_at({200, 200}), InvalidPosition);
+    REQUIRE_THROWS_AS(game.spawn_unit_at({200, 200}, {}), InvalidPosition);
   }
 
   SECTION("Units will stop at map boundaries") {
-    auto unit = game.spawn_unit_at({0, 0});
+    auto unit = game.spawn_unit_at({0, 0}, {});
     game.move(unit, {200, 0});
 
     UpdateTimes(game, 200);
@@ -195,8 +195,8 @@ struct GameEventsMock : public Game::GameEvents {
 TEST_CASE("Units can attack each other, and inflict specific damage for every"
           "attack cycles", "[GameRules]") {
   auto game = Game{}; 
-  auto victim = game.spawn_unit_at({0, 0});
-  auto attacker = game.spawn_unit_at({10, 0});
+  auto victim = game.spawn_unit_at({0, 0}, {});
+  auto attacker = game.spawn_unit_at({10, 0}, {});
 
   game.attack(attacker, victim);
 
@@ -218,8 +218,10 @@ TEST_CASE("In a game units have an attack radius", "[GameRules]") {
   using namespace trompeloeil;
 
   auto game = Game{}; 
-  auto victim = game.spawn_unit_at({5, 5});
-  auto attacker = game.spawn_unit_at({100, 5}, 20);
+  auto victim = game.spawn_unit_at({5, 5}, {});
+  auto attacker = game.spawn_unit_at({100, 5},
+      UnitProperties{UnitProperties::Make().attack_radius(20)}
+  );
 
   game.attack(attacker, victim);
 

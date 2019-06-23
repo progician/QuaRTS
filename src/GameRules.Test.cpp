@@ -189,6 +189,7 @@ TEST_CASE("Units are limited to the map's dimensions", "[GameRules]") {
 
 struct GameEventsMock : public Game::GameEvents {
   MAKE_MOCK1(damage, void(Game::UnitRef), override);
+  MAKE_MOCK1(casualty, void(Game::UnitRef), override);
 };
 
 
@@ -260,7 +261,18 @@ TEST_CASE("A unit under attack looses HP (hit points)", "[GameRules]") {
   auto attacker = game.spawn_unit_at({100, 5}, attacker_props);
   game.attack(attacker, victim);
 
-  UpdateTimes(game, 1);
+  SECTION("with during updates") {
+    UpdateTimes(game, 1);
+    REQUIRE(game.unit(victim).hit_points() == 8);
+  }
 
-  REQUIRE(game.unit(victim).hit_points() == 8);
+  SECTION("and if the hit-points reach 0, the unit will die") {
+    auto game_events = std::make_shared<GameEventsMock>();
+    game.listen(game_events);
+
+    REQUIRE_CALL(*game_events, damage(victim)).TIMES(4);
+    REQUIRE_CALL(*game_events, casualty(victim));
+
+    UpdateTimes(game, 5);
+  }
 }

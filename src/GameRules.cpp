@@ -119,7 +119,13 @@ namespace GameRules {
             auto const distance = LengthOf(target.location - unit.location);
             if (distance <= unit.props.attack_radius()) {
               target.take_damage(unit.props.attack_damage());
-              if (listener_) {
+              if (target.props.hit_points() <= 0) {
+                if (listener_) {
+                  listener_->casualty(attack.target);
+                  units_.erase(attack.target.id);
+                }
+              }
+              else if (listener_) {
                 listener_->damage(attack.target);
               }
             }

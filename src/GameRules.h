@@ -128,6 +128,7 @@ namespace GameRules {
     
     struct GameEvents {
       virtual void damage(UnitRef) = 0;
+      virtual void casualty(UnitRef) = 0;
     };
     using GameEventsPtr = std::shared_ptr<GameEvents>;
 

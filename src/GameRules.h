@@ -3,12 +3,9 @@
 #include "PlanePrimitives.h"
 
 #include <chrono>
-#include <initializer_list>
 #include <limits>
 #include <memory>
-#include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 

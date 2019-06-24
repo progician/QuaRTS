@@ -20,7 +20,11 @@ endif()
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
 
 add_library(QuaRTS.Base OBJECT)
-target_sources(QuaRTS.Base PRIVATE src/GameRules.cpp)
+target_sources(QuaRTS.Base
+    PRIVATE
+        src/GameRules.cpp
+        src/MatchModel.cpp
+)
 
 add_executable(QuaRTS)
 target_sources(QuaRTS PRIVATE src/QuaRTS.cpp)
@@ -38,6 +42,7 @@ if (USE_UNIT_TESTS)
         PRIVATE
             src/GameRules.Test.cpp
             src/Main.Test.cpp
+            src/MatchModel.Test.cpp
     )
     target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})
     target_link_libraries(QuaRTS.UT PRIVATE QuaRTS.Base Catch2::Catch2)

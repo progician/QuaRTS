@@ -205,12 +205,12 @@ public:
       : location_{loc}
       , epsilon_{epsilon} {}
   
-  bool match(Location const& rhs) const override {
+  auto match(Location const& rhs) const -> bool override {
     auto const displacement = location_ - rhs;
     return LengthOf(displacement) < epsilon_;
   }
 
-  std::string describe() const override {
+  auto describe() const -> std::string override {
     auto ostr = std::stringstream{};
     ostr << "is within " <<  epsilon_ << " distance of " << location_;
     return ostr.str();

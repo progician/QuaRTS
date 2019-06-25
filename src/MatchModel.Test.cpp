@@ -53,11 +53,11 @@ class WonBy : public Catch::MatcherBase<Match> {
 public:
   WonBy(std::string name) : name_(std::move(name)) {}
 
-  bool match(Match const& rhs) const override {
+  auto match(Match const& rhs) const -> bool override {
     return rhs.finished() && rhs.winner().name() == name_;
   }
 
-  std::string describe() const override {
+  auto describe() const -> std::string override {
     std::ostringstream ostr;
     ostr << "won by " << name_;
     return ostr.str();

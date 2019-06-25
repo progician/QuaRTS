@@ -32,6 +32,7 @@ namespace PlanePrimitives {
 
 using namespace GameRules;
 using PlanePrimitives::Location;
+using PlanePrimitives::Vector;
 using namespace std::chrono_literals;
 
 
@@ -193,4 +194,40 @@ TEST_CASE("A unit under attack looses HP (hit points)", "[GameRules]") {
 
     UpdateTimes(game, 5);
   }
+}
+
+
+class UnitReaches : public Catch::MatcherBase<Game> {
+  Game::UnitRef unit_;
+  Location location_;
+public:
+  UnitReaches(Game::UnitRef unit, Location location)
+      : unit_(unit)
+      , location_(location) {}
+
+  bool match(Game const& rhs) const override {
+    auto const displacement = rhs.position_of(unit_) - location_;
+    auto const reached_destination = LengthOf(displacement) < 0.0001f;
+    auto const unit_is_idle = rhs.active_command_for(unit_) == Command::None;
+    return reached_destination && unit_is_idle;
+  }
+
+  std::string describe() const override {
+    std::ostringstream ostr;
+    ostr << "unit (" << unit_.id << ")";
+    ostr << " has not reach its destination {" << location_ << "}";
+    return ostr.str();
+  }
+};
+
+
+TEST_CASE("Units move through the map with a velocity based on their properties") {
+  auto game = Game{};
+  UnitProperties const unit_props  = UnitProperties::Make().velocity(2);
+  auto const original_position = Location{20, 54};
+  auto const unit = game.spawn_unit_at(original_position, unit_props);
+
+  game.move(unit, original_position + Vector{8, 6});
+  UpdateTimes(game, 5);
+  REQUIRE_THAT(game, UnitReaches(unit, original_position + Vector{8, 6}));
 }

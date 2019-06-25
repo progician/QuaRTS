@@ -30,6 +30,7 @@ namespace GameRules {
     int hit_points_{std::numeric_limits<int>::max()};
     float attack_radius_{std::numeric_limits<float>::infinity()};
     int attack_damage_{0};
+    float velocity_{1.0f};
 
   public:
     friend class Unit;
@@ -38,6 +39,7 @@ namespace GameRules {
     auto hit_points() const -> int { return hit_points_; }
     auto attack_radius() const -> float { return attack_radius_; }
     auto attack_damage() const -> float { return attack_damage_; }
+    auto velocity() const -> float { return velocity_; }
 
     static auto Make() -> UnitPropertiesBuilder;
   };
@@ -61,6 +63,11 @@ namespace GameRules {
 
     auto attack_damage(int value) -> ThisType& {
       props.attack_damage_ = value;
+      return *this;
+    }
+
+    auto velocity(float value) -> ThisType& {
+      props.velocity_ = value;
       return *this;
     }
 

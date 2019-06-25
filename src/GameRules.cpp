@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <limits>
 #include <stdexcept>
 #include <utility>
@@ -81,10 +82,12 @@ namespace GameRules {
 
           [&](Commands::Move const& move) {
             auto const direction = Normalized(move.loc - unit.location);
-            auto const new_location = unit.location + direction * d.count();
+            auto const new_location = unit.location + unit.props.velocity() * direction * d.count();
             unit.location = PlanePrimitives::Clip(map_dimensions_, new_location);
 
-            if (unit.location == move.loc) {
+            auto const displacement = unit.location - move.loc;
+            auto const distance_to_target = LengthOf(displacement);
+            if (distance_to_target < 0.0001f) {
               unit.command = Commands::Idle{};
             }
           },

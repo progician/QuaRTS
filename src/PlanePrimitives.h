@@ -26,7 +26,9 @@ namespace PlanePrimitives {
   };
 
 
-  inline auto operator -(Vector const& lhs, Vector const& rhs) noexcept -> Vector {
+  inline auto operator -(
+      Vector const& lhs, Vector const& rhs
+  ) noexcept -> Vector {
     return {
       lhs.x - rhs.x,
       lhs.y - rhs.y
@@ -34,7 +36,9 @@ namespace PlanePrimitives {
   }
 
 
-  inline auto operator +(Location const& lhs, Vector const& rhs) noexcept -> Location {
+  inline auto operator +(
+      Location const& lhs, Vector const& rhs
+  ) noexcept -> Location {
     return {
       lhs.x + rhs.x,
       lhs.y + rhs.y
@@ -90,25 +94,27 @@ namespace PlanePrimitives {
     float bottom;
 
     Rectangle(float l, float t, float r, float b)
-    : left{l}
-    , right{r}
-    , top{t}
-    , bottom{b} {}
+        : left{l}
+        , right{r}
+        , top{t}
+        , bottom{b} {}
 
     Rectangle(Size const& sz)
-    : left{0}
-    , right{sz.width}
-    , top{0}
-    , bottom{sz.height} {}
+        : left{0}
+        , right{sz.width}
+        , top{0}
+        , bottom{sz.height} {}
 
     Rectangle(Location const& loc, Size const& sz)
-    : left{loc.x}
-    , right{loc.x + sz.width}
-    , top{loc.y}
-    , bottom{loc.y + sz.height} {}
+        : left{loc.x}
+        , right{loc.x + sz.width}
+        , top{loc.y}
+        , bottom{loc.y + sz.height} {}
   };
 
-  inline auto Contains(Rectangle const& rect, Location const& loc) noexcept -> bool {
+  inline auto Contains(
+      Rectangle const& rect, Location const& loc
+  ) noexcept -> bool {
     if (loc.x < rect.left || loc.x > rect.right)
       return false;
     if (loc.y < rect.top || loc.y > rect.bottom)
@@ -117,10 +123,29 @@ namespace PlanePrimitives {
   }
 
 
-  inline auto Clip(Rectangle const& rect, Location const& loc) noexcept -> Location {
+  inline auto Clip(
+      Rectangle const& rect, Location const& loc
+  ) noexcept -> Location {
     return Location{
-      std::min(rect.right, std::max(rect.left, loc.x)),
-      std::min(rect.bottom, std::max(rect.top, loc.y)),
+        std::min(rect.right, std::max(rect.left, loc.x)),
+        std::min(rect.bottom, std::max(rect.top, loc.y)),
+    };
+  }
+
+
+  inline auto CenterOf(Rectangle const& rect) noexcept -> Location {
+    return Location{
+       (rect.left + rect.right) / 2.0f,
+       (rect.top + rect.bottom) / 2.0f 
+    };
+  }
+
+  inline auto ContractedBy(
+      Rectangle const& rect, float value
+  ) noexcept -> Rectangle {
+    return {
+        rect.left + value, rect.top + value,
+        rect.right - value, rect.bottom - value
     };
   }
 }

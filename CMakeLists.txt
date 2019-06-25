@@ -43,6 +43,7 @@ if (USE_UNIT_TESTS)
             src/GameRules.Test.cpp
             src/Main.Test.cpp
             src/MatchModel.Test.cpp
+            src/PlanePrimitives.Test.cpp
     )
     target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})
     target_link_libraries(QuaRTS.UT PRIVATE QuaRTS.Base Catch2::Catch2)

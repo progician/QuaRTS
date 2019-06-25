@@ -109,7 +109,7 @@ namespace GameRules {
             }
             else {
               auto const direction = Normalized(target.location - unit.location);
-              unit.location = unit.location + direction * d.count();
+              unit.location = unit.location + unit.props.velocity() * direction * d.count();
             }
           }
       );

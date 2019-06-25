@@ -51,7 +51,7 @@ using namespace Catch::Matchers;
 class WonBy : public Catch::MatcherBase<Match> {
   std::string const name_;
 public:
-  WonBy(std::string name) : name_{name} {}
+  WonBy(std::string name) : name_(std::move(name)) {}
 
   bool match(Match const& rhs) const override {
     return rhs.finished() && rhs.winner().name() == name_;

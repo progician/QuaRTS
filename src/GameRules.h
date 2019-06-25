@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace GameRules {
@@ -22,6 +23,16 @@ namespace GameRules {
     Attack,
   };
 
+  namespace UnitShape {
+    struct Circle {
+      float radius;
+    };
+  }
+
+  using Shape = std::variant<
+      UnitShape::Circle
+  >;
+
 
   class Unit;
   class UnitPropertiesBuilder;
@@ -31,6 +42,7 @@ namespace GameRules {
     float attack_radius_{std::numeric_limits<float>::infinity()};
     int attack_damage_{0};
     float velocity_{1.0f};
+    Shape shape_;
 
   public:
     friend class Unit;
@@ -40,6 +52,7 @@ namespace GameRules {
     auto attack_radius() const -> float { return attack_radius_; }
     auto attack_damage() const -> float { return attack_damage_; }
     auto velocity() const -> float { return velocity_; }
+    auto shape() const -> Shape { return shape_; }
 
     static auto Make() -> UnitPropertiesBuilder;
   };
@@ -68,6 +81,11 @@ namespace GameRules {
 
     auto velocity(float value) -> ThisType& {
       props.velocity_ = value;
+      return *this;
+    }
+
+    auto shape(Shape shape) -> ThisType& {
+      props.shape_ = shape;
       return *this;
     }
 

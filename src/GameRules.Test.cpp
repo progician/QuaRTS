@@ -245,3 +245,18 @@ TEST_CASE("Units move through the map with a velocity based on their properties"
     );
   }
 }
+
+
+TEST_CASE("Units can have a shape") {
+  auto game = Game{256, 128};
+  auto const circular_unit = game.spawn_unit_at({12, 21},
+      UnitProperties::Make()
+          .shape(UnitShape::Circle{10.0f})
+  );
+
+  SECTION("which restricts to the movement of the unit") {
+    game.move(circular_unit, {12, 1});
+    UpdateTimes(game, 20);
+    REQUIRE_THAT(game.position_of(circular_unit), CloseTo({12, 10}));
+  }
+}

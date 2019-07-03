@@ -83,7 +83,7 @@ namespace GameRules {
           [&](Commands::Move const& move) {
             auto const direction = Normalized(move.loc - unit.location);
             auto const new_location = unit.location + unit.props.velocity() * direction * d.count();
-            auto const& unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
+            auto const unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
             auto const available_area = PlanePrimitives::ContractedBy(
                 Rectangle{map_dimensions_},
                 unit_radius

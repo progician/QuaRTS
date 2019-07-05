@@ -13,9 +13,11 @@ if (NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 endif()
 
-if(CMAKE_CXX_STANDARD LESS 17)
+if (CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "Incompatible C++ standard ${CMAKE_CXX_STANDARD}.")
 endif()
+
+set(ASAN_FLAGS "-fsanitize=undefined,address")
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
 
@@ -29,6 +31,12 @@ target_sources(QuaRTS.Base
 add_executable(QuaRTS)
 target_sources(QuaRTS PRIVATE src/QuaRTS.cpp)
 target_link_libraries(QuaRTS PRIVATE QuaRTS.Base)
+
+option(USE_SANITIZERS "Use UB and Address sanitizers" OFF)
+if (USE_SANITIZERS)
+    target_compile_options(QuaRTS PUBLIC ${ASAN_FLAGS})
+    target_link_options(QuaRTS PUBLIC ${ASAN_FLAGS})
+endif()
 
 option(USE_UNIT_TESTS "Build and run unit tests during the build." ON)
 if (USE_UNIT_TESTS)
@@ -47,6 +55,7 @@ if (USE_UNIT_TESTS)
     )
     target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})
     target_link_libraries(QuaRTS.UT PRIVATE QuaRTS.Base Catch2::Catch2)
+
     add_custom_command(
         TARGET QuaRTS.UT POST_BUILD
         COMMAND QuaRTS.UT

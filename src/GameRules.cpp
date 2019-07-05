@@ -37,6 +37,7 @@ namespace GameRules {
     Location location;
     UnitCommand command{Commands::Idle{}};
     UnitProperties props;
+    float velocity_{0.0f};
     Unit(Location l, UnitProperties p) : location{l}, props{p} {}
 
     void take_damage(int v) {
@@ -82,7 +83,11 @@ namespace GameRules {
 
           [&](Commands::Move const& move) {
             auto const direction = Normalized(move.loc - unit.location);
-            auto const new_location = unit.location + unit.props.velocity() * direction * d.count();
+            unit.velocity_ = std::min(
+                unit.velocity_ + unit.props.acceleration(),
+                unit.props.velocity()
+            );
+            auto const new_location = unit.location + unit.velocity_ * direction * d.count();
             auto const unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
             auto const available_area = PlanePrimitives::ContractedBy(
                 Rectangle{map_dimensions_},

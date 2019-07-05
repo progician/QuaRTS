@@ -43,6 +43,7 @@ namespace GameRules {
     int attack_damage_{0};
     float velocity_{1.0f};
     Shape shape_;
+    float acceleration_{std::numeric_limits<float>::infinity()};
 
   public:
     friend class Unit;
@@ -53,6 +54,7 @@ namespace GameRules {
     auto attack_damage() const -> float { return attack_damage_; }
     auto velocity() const -> float { return velocity_; }
     auto shape() const -> Shape { return shape_; }
+    auto acceleration() const -> float { return acceleration_; }
 
     static auto Make() -> UnitPropertiesBuilder;
   };
@@ -86,6 +88,11 @@ namespace GameRules {
 
     auto shape(Shape shape) -> ThisType& {
       props.shape_ = shape;
+      return *this;
+    }
+
+    auto acceleration(float value) -> ThisType& {
+      props.acceleration_ = value;
       return *this;
     }
 

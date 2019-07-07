@@ -1,7 +1,7 @@
 #include "game.h"
 #include "geometry.h"
 
-#include "Variant.h"
+#include "variant.h"
 
 #include <algorithm>
 #include <atomic>
@@ -79,7 +79,7 @@ namespace game {
   void Game::update(Game::Duration d) {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
-      Variant::Match(unit.command,
+      variant::Match(unit.command,
           [](Commands::Idle const&) {},
 
           [&](Commands::Move const& move) {
@@ -130,7 +130,7 @@ namespace game {
   
   auto Game::active_command_for(UnitRef ref) const -> Command {
     auto const& unit = *units_.at(ref.id);
-    return Variant::Match(unit.command,
+    return variant::Match(unit.command,
         [](Commands::Idle const&) -> Command { return Command::None; },
         [](Commands::Move const&) -> Command { return Command::Move; },
         [](Commands::Attack const&) -> Command { return Command::Attack; }

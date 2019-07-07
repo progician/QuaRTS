@@ -3,7 +3,7 @@
 #include <utility>
 #include <variant>
 
-namespace Variant {
+namespace variant {
   namespace detail {
     template<class... Ts> struct overloaded : Ts... {
       using Ts::operator()...;

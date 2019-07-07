@@ -10,7 +10,7 @@
 #include <variant>
 #include <vector>
 
-namespace GameRules {
+namespace game {
   class InvalidPosition : public std::runtime_error {
   public:
     InvalidPosition() : std::runtime_error("Position is out of bounds!") {}

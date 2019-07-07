@@ -12,7 +12,7 @@
 
 using namespace PlanePrimitives;
 
-namespace GameRules {
+namespace game {
   namespace Commands {
     using Idle = std::monostate;
     struct Move {

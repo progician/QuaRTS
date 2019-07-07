@@ -10,7 +10,7 @@
 #include <memory>
 
 
-namespace GameRules {
+namespace game {
   auto operator <<(std::ostream& lhs, Command rhs) -> std::ostream& {
     switch(rhs) {
       case Command::None: lhs <<  "None"; break;
@@ -30,7 +30,7 @@ namespace PlanePrimitives {
 }
 
 
-using namespace GameRules;
+using namespace game;
 using PlanePrimitives::Location;
 using PlanePrimitives::Vector;
 using namespace std::chrono_literals;

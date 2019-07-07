@@ -5,7 +5,7 @@
 #include <string>
 
 
-namespace MatchModel {
+namespace match {
   Match::Match(std::initializer_list<std::string> l) {
     for (auto&& player_name : l) {
       players_.emplace(player_name);

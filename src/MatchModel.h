@@ -7,7 +7,7 @@
 #include <vector>
 
 
-namespace MatchModel {
+namespace match {
   class Player {
     std::string const name_;
   public:
@@ -20,15 +20,15 @@ namespace MatchModel {
 
 
 namespace std {
-  template<> struct hash<MatchModel::Player> {
-    std::size_t operator()(MatchModel::Player const& player) const {
+  template<> struct hash<match::Player> {
+    std::size_t operator()(match::Player const& player) const {
       return std::hash<std::string>{}(player.name());
     }
   };
 }
 
 
-namespace MatchModel {
+namespace match {
   using EventsPtr = std::shared_ptr<struct Events>;
 
   class Match {

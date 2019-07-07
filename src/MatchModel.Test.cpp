@@ -5,7 +5,7 @@
 #include <trompeloeil.hpp>
 
 
-namespace MatchModel {
+namespace match {
   std::ostream& operator <<(std::ostream& lhs, Player const& rhs) {
     lhs << rhs.name();
     return lhs;
@@ -13,7 +13,7 @@ namespace MatchModel {
 }
 
 
-using namespace MatchModel;
+using namespace match;
 
 
 TEST_CASE("A Match created with a single player is automatically finished") {

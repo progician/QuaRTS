@@ -14,7 +14,7 @@
 using namespace geometry;
 
 namespace game {
-  namespace Commands {
+  namespace commands {
     using Idle = std::monostate;
     struct Move {
       Location loc;
@@ -28,15 +28,15 @@ namespace game {
 
 
   using UnitCommand = std::variant<
-      Commands::Idle,
-      Commands::Move,
-      Commands::Attack
+      commands::Idle,
+      commands::Move,
+      commands::Attack
   >;
 
 
   struct Unit {
     Location location;
-    UnitCommand command{Commands::Idle{}};
+    UnitCommand command{commands::Idle{}};
     UnitProperties props;
     float velocity_{0.0f};
     Unit(Location l, UnitProperties p) : location{l}, props{p} {}
@@ -72,7 +72,7 @@ namespace game {
   }
 
   void Game::move(UnitRef ref, Location location) {
-    units_.at(ref.id)->command = Commands::Move{location};
+    units_.at(ref.id)->command = commands::Move{location};
   }
 
 
@@ -80,9 +80,9 @@ namespace game {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
       variant::Match(unit.command,
-          [](Commands::Idle const&) {},
+          [](commands::Idle const&) {},
 
-          [&](Commands::Move const& move) {
+          [&](commands::Move const& move) {
             auto const direction = Normalized(move.loc - unit.location);
             unit.velocity_ = std::min(
                 unit.velocity_ + unit.props.acceleration(),
@@ -99,11 +99,11 @@ namespace game {
             auto const displacement = unit.location - move.loc;
             auto const distance_to_target = LengthOf(displacement);
             if (distance_to_target < 0.0001f) {
-              unit.command = Commands::Idle{};
+              unit.command = commands::Idle{};
             }
           },
 
-          [&](Commands::Attack const& attack) {
+          [&](commands::Attack const& attack) {
             auto& target = *units_.at(attack.target.id);
             auto const distance = LengthOf(target.location - unit.location);
             if (distance <= unit.props.attack_radius()) {
@@ -131,16 +131,16 @@ namespace game {
   auto Game::active_command_for(UnitRef ref) const -> Command {
     auto const& unit = *units_.at(ref.id);
     return variant::Match(unit.command,
-        [](Commands::Idle const&) -> Command { return Command::None; },
-        [](Commands::Move const&) -> Command { return Command::Move; },
-        [](Commands::Attack const&) -> Command { return Command::Attack; }
+        [](commands::Idle const&) -> Command { return Command::None; },
+        [](commands::Move const&) -> Command { return Command::Move; },
+        [](commands::Attack const&) -> Command { return Command::Attack; }
     );
   }
 
   
   void Game::attack(UnitRef attacker_ref, UnitRef target_ref) {
     auto& attacker = *units_.at(attacker_ref.id);
-    attacker.command = Commands::Attack{target_ref};
+    attacker.command = commands::Attack{target_ref};
   }
 
 

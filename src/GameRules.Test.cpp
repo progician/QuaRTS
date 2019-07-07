@@ -48,7 +48,7 @@ void UpdateTimes(Game& game, int times) {
 
 
 
-TEST_CASE("Given a game with a unit spawned at the origin.", "[GameRules]") {
+TEST_CASE("Given a game with a unit spawned at the origin.") {
   auto game = Game{};
   auto const SomeLocation = Location{0, 255};
   auto unit = game.spawn_unit_at(SomeLocation, {});
@@ -88,7 +88,7 @@ TEST_CASE("Given a game with a unit spawned at the origin.", "[GameRules]") {
 }
 
 
-TEST_CASE("Units are limited to the map's dimensions", "[GameRules]") {
+TEST_CASE("Units are limited to the map's dimensions") {
   auto game = Game{128, 128};
 
   SECTION("cannot spawn unit outside of the boundary") {
@@ -113,7 +113,7 @@ struct GameEventsMock : public Game::GameEvents {
 
 
 TEST_CASE("Units can attack each other, and inflict specific damage for every"
-          "attack cycles", "[GameRules]") {
+          "attack cycles") {
   auto game = Game{}; 
   auto victim = game.spawn_unit_at({0, 0}, {});
   auto attacker = game.spawn_unit_at({10, 0}, {});
@@ -134,7 +134,7 @@ TEST_CASE("Units can attack each other, and inflict specific damage for every"
 }
 
 
-TEST_CASE("In a game units have an attack radius", "[GameRules]") {
+TEST_CASE("In a game units have an attack radius") {
   using namespace trompeloeil;
 
   auto game = Game{}; 
@@ -171,7 +171,7 @@ TEST_CASE("In a game units have an attack radius", "[GameRules]") {
 }
 
 
-TEST_CASE("A unit under attack looses HP (hit points)", "[GameRules]") {
+TEST_CASE("A unit under attack looses HP (hit points)") {
   auto game = Game{}; 
   UnitProperties const victim_props = UnitProperties::Make().hit_points(10);
   auto victim = game.spawn_unit_at({5, 5}, victim_props);

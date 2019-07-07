@@ -16,7 +16,7 @@ namespace MatchModel {
 using namespace MatchModel;
 
 
-TEST_CASE("A Match created with a single player is automatically finished", "[Match]") {
+TEST_CASE("A Match created with a single player is automatically finished") {
   static auto const SingularPlayer = std::string{"Some Named Player"};
   auto match = Match{SingularPlayer};
   REQUIRE(match.finished());
@@ -27,13 +27,13 @@ TEST_CASE("A Match created with a single player is automatically finished", "[Ma
 }
 
 
-TEST_CASE("A Match is ongoing if there is at least two players", "[Match]") {
+TEST_CASE("A Match is ongoing if there is at least two players") {
   auto match = Match{"X", "Y"};
   REQUIRE_FALSE(match.finished());
 }
 
 
-TEST_CASE("Match maintains the set of active players", "[Match]") {
+TEST_CASE("Match maintains the set of active players") {
   auto match = Match{"X", "Y", "Z"};
 
   SECTION("which is by default all the players") {
@@ -64,7 +64,7 @@ public:
   }
 };
 
-TEST_CASE("When the all but one player resigns, the game finishes", "[Match]") {
+TEST_CASE("When the all but one player resigns, the game finishes") {
   auto match = Match{"X", "Y"};
   match.resign("X");
 
@@ -77,7 +77,7 @@ struct EventsMock : public Events {
 };
 
 
-TEST_CASE("when a match comes to a conclusion, all listeners will be notified", "[Match]") {
+TEST_CASE("when a match comes to a conclusion, all listeners will be notified") {
   auto match_events = std::make_shared<EventsMock>();
   auto match = Match{"X", "Y"};
 

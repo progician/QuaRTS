@@ -1,6 +1,6 @@
 #include "game.h"
 
-#include "PlanePrimitives.h"
+#include "geometry.h"
 
 #include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
@@ -22,7 +22,7 @@ namespace game {
   }
 }
 
-namespace PlanePrimitives {
+namespace geometry {
   std::ostream& operator <<(std::ostream& lhs, Location const& rhs) {
     lhs << "{" << rhs.x << "," << rhs.y << "}";
     return lhs;
@@ -31,8 +31,8 @@ namespace PlanePrimitives {
 
 
 using namespace game;
-using PlanePrimitives::Location;
-using PlanePrimitives::Vector;
+using geometry::Location;
+using geometry::Vector;
 using namespace std::chrono_literals;
 
 

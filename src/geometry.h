@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace PlanePrimitives {
+namespace geometry {
   struct Location {
     float x;
     float y;

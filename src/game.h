@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PlanePrimitives.h"
+#include "geometry.h"
 
 #include <chrono>
 #include <limits>
@@ -119,7 +119,7 @@ namespace game {
     using UnitPtr = std::unique_ptr<Unit>;
     std::unordered_map<int, UnitPtr> units_;
 
-    PlanePrimitives::Size const map_dimensions_{
+    geometry::Size const map_dimensions_{
       std::numeric_limits<float>::infinity(),
       std::numeric_limits<float>::infinity(),
     };
@@ -131,12 +131,12 @@ namespace game {
     Game(float, float);
     ~Game();
 
-    auto spawn_unit_at(PlanePrimitives::Location, UnitProperties const&) -> UnitRef;
-    auto position_of(UnitRef ref) const -> PlanePrimitives::Location;
+    auto spawn_unit_at(geometry::Location, UnitProperties const&) -> UnitRef;
+    auto position_of(UnitRef ref) const -> geometry::Location;
     auto unit(UnitRef ref) const -> UnitProperties;
     auto active_command_for(UnitRef ref) const -> Command;
 
-    void move(UnitRef, PlanePrimitives::Location);
+    void move(UnitRef, geometry::Location);
     void attack(UnitRef, UnitRef);
 
     using Duration = std::chrono::duration<float>;

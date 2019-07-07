@@ -51,7 +51,7 @@ if (USE_UNIT_TESTS)
             src/game.Test.cpp
             src/Main.Test.cpp
             src/match.Test.cpp
-            src/PlanePrimitives.Test.cpp
+            src/geometry.Test.cpp
     )
     target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})
     target_link_libraries(QuaRTS.UT PRIVATE QuaRTS.Base Catch2::Catch2)

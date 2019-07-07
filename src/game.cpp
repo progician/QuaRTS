@@ -1,4 +1,5 @@
 #include "game.h"
+#include "geometry.h"
 
 #include "Variant.h"
 
@@ -10,7 +11,7 @@
 #include <utility>
 #include <variant>
 
-using namespace PlanePrimitives;
+using namespace geometry;
 
 namespace game {
   namespace Commands {
@@ -89,11 +90,11 @@ namespace game {
             );
             auto const new_location = unit.location + unit.velocity_ * direction * d.count();
             auto const unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
-            auto const available_area = PlanePrimitives::ContractedBy(
+            auto const available_area = geometry::ContractedBy(
                 Rectangle{map_dimensions_},
                 unit_radius
             );
-            unit.location = PlanePrimitives::Clip(available_area, new_location);
+            unit.location = geometry::Clip(available_area, new_location);
 
             auto const displacement = unit.location - move.loc;
             auto const distance_to_target = LengthOf(displacement);

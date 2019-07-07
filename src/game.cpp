@@ -1,4 +1,4 @@
-#include "GameRules.h"
+#include "game.h"
 
 #include "Variant.h"
 

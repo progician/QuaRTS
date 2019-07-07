@@ -24,8 +24,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
 add_library(QuaRTS.Base OBJECT)
 target_sources(QuaRTS.Base
     PRIVATE
-        src/GameRules.cpp
-        src/MatchModel.cpp
+        src/game.cpp
+        src/match.cpp
 )
 
 add_executable(QuaRTS)
@@ -48,9 +48,9 @@ if (USE_UNIT_TESTS)
     add_executable(QuaRTS.UT)
     target_sources(QuaRTS.UT 
         PRIVATE
-            src/GameRules.Test.cpp
+            src/game.Test.cpp
             src/Main.Test.cpp
-            src/MatchModel.Test.cpp
+            src/match.Test.cpp
             src/PlanePrimitives.Test.cpp
     )
     target_include_directories(QuaRTS.UT PRIVATE ${TROMPELOEIL_INCLUDE_DIR})

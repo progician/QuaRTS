@@ -71,8 +71,55 @@ namespace game {
     return ref;
   }
 
+
   void Game::move(UnitRef ref, Location location) {
     units_.at(ref.id)->command = commands::Move{location};
+  }
+
+
+  void Game::be_idle(Unit&) {}
+
+  void Game::do_move(Unit& unit, commands::Move const& move) {
+    auto const direction = Normalized(move.loc - unit.location);
+    unit.velocity_ = std::min(
+        unit.velocity_ + unit.props.acceleration(),
+        unit.props.velocity()
+    );
+    auto const new_location = unit.location + unit.velocity_ * direction;
+    auto const unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
+    auto const available_area = geometry::ContractedBy(
+        Rectangle{map_dimensions_},
+        unit_radius
+    );
+    unit.location = geometry::Clip(available_area, new_location);
+
+    auto const displacement = unit.location - move.loc;
+    auto const distance_to_target = LengthOf(displacement);
+    if (distance_to_target < 0.0001f) {
+      unit.command = commands::Idle{};
+    }
+  }
+
+
+  void Game::do_attack(Unit& unit, commands::Attack const& attack) {
+    auto& target = *units_.at(attack.target.id);
+    auto const distance = LengthOf(target.location - unit.location);
+    if (distance <= unit.props.attack_radius()) {
+      target.take_damage(unit.props.attack_damage());
+      if (target.props.hit_points() <= 0) {
+        if (listener_) {
+          listener_->casualty(attack.target);
+          units_.erase(attack.target.id);
+        }
+      }
+      else if (listener_) {
+        listener_->damage(attack.target);
+      }
+    }
+    else {
+      auto const direction = Normalized(target.location - unit.location);
+      unit.location = unit.location + unit.props.velocity() * direction;
+    }
   }
 
 
@@ -80,49 +127,9 @@ namespace game {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
       variant::Match(unit.command,
-          [](commands::Idle const&) {},
-
-          [&](commands::Move const& move) {
-            auto const direction = Normalized(move.loc - unit.location);
-            unit.velocity_ = std::min(
-                unit.velocity_ + unit.props.acceleration(),
-                unit.props.velocity()
-            );
-            auto const new_location = unit.location + unit.velocity_ * direction * d.count();
-            auto const unit_radius = std::get<UnitShape::Circle>(unit.props.shape()).radius;
-            auto const available_area = geometry::ContractedBy(
-                Rectangle{map_dimensions_},
-                unit_radius
-            );
-            unit.location = geometry::Clip(available_area, new_location);
-
-            auto const displacement = unit.location - move.loc;
-            auto const distance_to_target = LengthOf(displacement);
-            if (distance_to_target < 0.0001f) {
-              unit.command = commands::Idle{};
-            }
-          },
-
-          [&](commands::Attack const& attack) {
-            auto& target = *units_.at(attack.target.id);
-            auto const distance = LengthOf(target.location - unit.location);
-            if (distance <= unit.props.attack_radius()) {
-              target.take_damage(unit.props.attack_damage());
-              if (target.props.hit_points() <= 0) {
-                if (listener_) {
-                  listener_->casualty(attack.target);
-                  units_.erase(attack.target.id);
-                }
-              }
-              else if (listener_) {
-                listener_->damage(attack.target);
-              }
-            }
-            else {
-              auto const direction = Normalized(target.location - unit.location);
-              unit.location = unit.location + unit.props.velocity() * direction * d.count();
-            }
-          }
+          [this, &unit](commands::Idle const& idle) { be_idle(unit); },
+          [this, &unit](commands::Move const& move) { do_move(unit, move); },
+          [this, &unit](commands::Attack const& attack) { do_attack(unit, attack); }
       );
     }
   }

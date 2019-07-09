@@ -104,6 +104,11 @@ namespace game {
     return UnitPropertiesBuilder{};
   }
 
+  namespace commands {
+    struct Move;
+    struct Attack;
+  }
+
 
   class Game {
   public:
@@ -125,6 +130,10 @@ namespace game {
     };
 
     GameEventsPtr listener_;
+
+    void be_idle(Unit&);
+    void do_move(Unit&, commands::Move const&);
+    void do_attack(Unit&, commands::Attack const&);
 
   public:
     Game();

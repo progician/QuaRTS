@@ -118,7 +118,11 @@ namespace game {
     }
     else {
       auto const direction = Normalized(target.location - unit.location);
-      unit.location = unit.location + unit.props.velocity() * direction;
+      unit.velocity_ = std::min(
+          unit.velocity_ + unit.props.acceleration(),
+          unit.props.velocity()
+      );
+      unit.location = unit.location + unit.velocity_ * direction;
     }
   }
 

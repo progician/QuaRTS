@@ -260,15 +260,24 @@ TEST_CASE("Units can have a shape") {
 
 TEST_CASE("Units have acceleration") {
   auto game = Game{32, 64};
+  auto const AttackRadius = 1.0f;
   auto const unit = game.spawn_unit_at({0, 0},
       UnitProperties::Make()
           .acceleration(0.1f)
           .velocity(10)
+          .attack_radius(1)
   );
 
   SECTION("which will be applied until they reach their velocity") {
     game.move(unit, {6, 8});
     UpdateTimes(game, 10);
     REQUIRE_THAT(game.position_of(unit), CloseTo({3.3, 4.4}));
+  }
+
+  SECTION("which is applied under attack command before reaching attack range") {
+    auto const victim = game.spawn_unit_at({10 + 1, 0}, {});
+    game.attack(unit, victim);
+    UpdateTimes(game, 10);
+    REQUIRE_THAT(game.position_of(unit), CloseTo({5.5f, 0}));
   }
 }

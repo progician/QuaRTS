@@ -2,7 +2,6 @@
 
 #include "geometry.h"
 
-#include <chrono>
 #include <limits>
 #include <memory>
 #include <unordered_map>
@@ -148,8 +147,7 @@ namespace game {
     void move(UnitRef, geometry::Location);
     void attack(UnitRef, UnitRef);
 
-    using Duration = std::chrono::duration<float>;
-    void update(Duration);
+    void update();
 
     void listen(GameEventsPtr l) { listener_ = l; }
   };

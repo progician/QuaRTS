@@ -5,7 +5,6 @@
 #include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
 
-#include <chrono>
 #include <iostream>
 #include <memory>
 
@@ -33,14 +32,11 @@ namespace geometry {
 using namespace game;
 using geometry::Location;
 using geometry::Vector;
-using namespace std::chrono_literals;
 
 
 void UpdateTimes(Game& game, int times) {
-  constexpr auto TimeResolution = 1s;
-  using std::chrono::seconds;
-  for (seconds i = 0s; i < seconds(times); i += TimeResolution) {
-    game.update(TimeResolution);
+  for (int i = times; i > 0; --i) {
+    game.update();
   }
 }
 

@@ -123,7 +123,7 @@ namespace game {
   }
 
 
-  void Game::update(Game::Duration d) {
+  void Game::update() {
     for (auto& [id, unit_ptr] : units_) {
       auto& unit = *unit_ptr;
       variant::Match(unit.command,
